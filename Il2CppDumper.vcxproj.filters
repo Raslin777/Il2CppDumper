@@ -45,4 +45,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="Release\Il2CppDumper.exe.manifest" />
+  </ItemGroup>
 </Project>

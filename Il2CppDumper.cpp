@@ -6,7 +6,15 @@
 #include "elf_structures.h"
 #include "elf_utils.h"
 #include "il2cpp_utils.h"
-#include <map>
+
+
+//using namespace std;
+
+//static string path1;
+//static string path2;
+
+int offset2;
+int offset1;
 
 elf_header* pLibIl2Cpp = 0;
 
@@ -89,7 +97,7 @@ char* get_type_name(Il2CppType* pType, bool* isClass = 0)
 		char* szRet = (char*)malloc(stRetLen + 1);
 		memset(szRet, 0, stRetLen + 1);
 		memcpy(szRet, szNameRet, stBaseNamelen);
-		
+
 		uint32_t uiOffset = stBaseNamelen + 1;
 		for (int i = 0; i < typeNames.size(); ++i)
 		{
@@ -103,7 +111,7 @@ char* get_type_name(Il2CppType* pType, bool* isClass = 0)
 		szRet[stBaseNamelen] = '<';
 		szRet[stRetLen - 1] = '>';
 		szRet[stRetLen] = 0;
-		
+
 		ret = szRet;
 		if (isClass)
 			*isClass = true;
@@ -340,6 +348,8 @@ void FixTypeAddresses(Il2CppType* pType)
 
 void LoadIl2CppLib(char* szFile)
 {
+
+
 	FILE* pFile = fopen(szFile, "rb");
 	fseek(pFile, 0, SEEK_END);
 	uint32_t uiSize = ftell(pFile);
@@ -358,9 +368,9 @@ void LoadIl2CppLib(char* szFile)
 	// Someone asked me about these two constants so I thought I should document what they are.
 	// These two pointers are the first two arguments passed to il2cpp::vm::MetadataCache::Register in the libil2cpp.so binary.
 	// Updating them manually should be fairly trivial, just find where il2cpp::vm::MetadataCache::Register is called and use the first two args for \
-	  code and metadata respectively.
-	pCodeRegistration = (Il2CppCodeRegistration*)MapVATR(0x14860F8, pLibIl2Cpp);
-	pMetadataRegistration = (Il2CppMetadataRegistration*)MapVATR(0x14A7F78, pLibIl2Cpp);
+	  code and metadata respectively. BE2AA8 - BEE4DC
+	pCodeRegistration = (Il2CppCodeRegistration*)MapVATR(offset2, pLibIl2Cpp);
+	pMetadataRegistration = (Il2CppMetadataRegistration*)MapVATR(offset1, pLibIl2Cpp);
 
 	// Fixes so that the code in il2cpp_utils.cpp and dumping funcstions above works...
 	pCodeRegistration->methodPointers = (uint32_t*)MapVATR((uint32_t)pCodeRegistration->methodPointers, pLibIl2Cpp);
@@ -373,12 +383,14 @@ void LoadIl2CppLib(char* szFile)
 		pMetadataRegistration->types[i] = (Il2CppType*)MapVATR((uint32_t)pMetadataRegistration->types[i], pLibIl2Cpp);
 		FixTypeAddresses(pMetadataRegistration->types[i]);
 	}
+	
 }
 
 int main(uint16_t argc, char** argv)
 {
+	
 	// Hardcoded cause I'm lazy
-	LoadMetadata("C:\\Projects\\Android\\PokeGo\\0.35.0\\assets\\bin\\Data\\Managed\\Metadata\\global-metadata.dat");
+	LoadMetadata("global-metadata.dat");
 	LoadIl2CppLib("libil2cpp.so");
 
 	//for (uint32_t i = 0; i < pCodeRegistration->methodPointersCount; ++i)
@@ -389,4 +401,3 @@ int main(uint16_t argc, char** argv)
 
     return 0;
 }
-
