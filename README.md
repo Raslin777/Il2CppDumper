@@ -7,3 +7,4 @@ Forked project from Jumboperson
 - CLI interactive where user can input the unk offset
 - DLL runtime included so that Windows does not require any Visual C++ runtime
 - Path fixes. The program must be located in the same directory as your binary to be dumped
+- OS detection. The CLI will look different if using Win 8.1 and below. This project will require Windows 10 SDK to compile.
